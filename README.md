@@ -6,3 +6,11 @@ The aim of this first project will be a visualization to show patterns or relati
 
 Through a cursory exploration of the raw data, the 'Food Pounds' variable and the 'Food Provided for' lend themselves nicely to a point graph.
 
+## Description of Data
+
+The data comes from Urban Ministries of Durham and describes the variety of services provided for clients over a multi-decadal time period. The data is stored as a .TSV file and includes both numeric and categorical data. 
+
+## Methodology
+
+This project will rely on the `tidyverse` for data cleaning and organization, as well as the `ggplot2` package for visualization. 
+
