@@ -1,12 +1,15 @@
-# Alfredo Rojas
-# BIOS 611: UMD data tidy
-# 9.21.19
+---
+title: 'Project 1: Urban Ministries of Durham Data'
+author: "Alfredo Rojas"
+date: "9/25/2019"
+output: html_document
+---
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=12, fig.height=10, echo=TRUE, warning=FALSE, message=FALSE)
+```
 
-# """
-# This code takes the Urban Ministries data and uses tidyr
-# to tidy the dataset for analysis
-# """
-
+This project will be exploring a dataset from the Urban Ministries of Durham (UMD). UMD has provided a .TSV file with information of services provided for their clients over the past couple of decades. In this project I will be exploring two variables: the amount of food provided for clients (in pounds) and the number of clothing items provided. To do so, I will rely on the `tidyverse` and `dplyr` packages, as well as on `ggplot2` for visualization. To start, I will need to upload some packages before I can begin cleaning the data.
+```{r}
 library(dplyr)
 library(tidyr)
 library(stringr)
@@ -16,10 +19,23 @@ library(GGally)
 # install.packages("gridExtra")
 library(gridExtra)
 
-# read in data
-UMD_data =  read_tsv("data/UMD_Services_Provided_20190719.tsv")
-UMD_data
+# read in data, this Rmd is saved in my "scripts" folder and when I knit it reads automatically
+# from "scripts", so I included ".." which brings it out of that directory so it can access #"data"
+UMD_data =  read_tsv("../data/UMD_Services_Provided_20190719.tsv")
+```
 
+Let's take a look to see if the data was read in properly.
+```{r}
+head(UMD_data)
+```
+
+Looks good!
+
+## Cleaning the data
+
+The first thing I notice is that some of the variables contain all NAs. Let's remove them.
+
+```{r}
 # Check the `Field 1 - 3` variables, are they empty?
 # from: https://www.quora.com/How-do-I-get-a-frequency-count-based-on-two-columns-variables-in-an-R-dataframe
 summarise(group_by(UMD_data, `Field1`, `Field2`, `Field3`), count = n())
@@ -27,11 +43,20 @@ summarise(group_by(UMD_data, `Field1`, `Field2`, `Field3`), count = n())
 # Remove Field1, Field2, and Field3 since they are all NAs
 UMD_data2 <- UMD_data %>%
   select(-`Client File Merge`, -`Field1`, -`Field2`, -`Field3`)
+```
+
+Next, I want to change the date format so it is interpretable by R:
 
 
+```{r}
 # change date format so R can interpret it
 UMD_data2$Date <- as.Date(UMD_data2$Date, "%m/%d/%Y")
+head(UMD_data$Date)
+```
 
+The next thing I will do is to clean up the data using pipes and common functions from the `dplyr` package. This creates a new object `UMD_food` that has new variables, such as "Pounds per person", "Sum of Food Pounds", "Average People who Received Food", and "Sum of Clothes Items Given." These are given the variable names: `lbs_per_prsn`, `food_pounds_sum`, `ppl_avg`, and `clothes_sum`, respectively.
+
+```{r}
 # clean data, select target variables, drop NAs, filter for 2000 - 2019, and group_by and summarise
 UMD_food <- UMD_data2 %>% 
   select(Date, `Client File Number`, `Food Provided for`, `Food Pounds`, `Clothing Items`) %>% 
@@ -45,9 +70,12 @@ UMD_food <- UMD_data2 %>%
             ppl_avg = mean(`Food Provided for`, na.rm = TRUE),
             clothes_sum = sum(`Clothing Items`), na.rm= TRUE) %>%
   filter(lbs_per_prsn > 0, food_pounds_sum > 0, ppl_avg > 0, clothes_sum > 0)
+```
 
+# Plotting the data
 
-
+Now that I have cleaned up the data, I want to plot it. I want to look at the amount of food provided on a monthly basis from the year 2000 to 2019. I can do that like this:
+```{r}
 # Plotting yearly food lbs per year on a monthly basis, using bar graph
 # help from: 
 # https://www.earthdatascience.org/courses/earth-analytics/time-series-data/summarize-time-series-by-month-in-r/
@@ -61,7 +89,10 @@ UMD_food %>% # create new monthly variable for bar graph
        x = "Log of sum of food lbs per day",
        y = "Log of clothing items per day") + theme_bw(base_size = 15) +
   scale_x_date(date_labels = "%b")
+```
 
+Next, I can explore the relationship between clothing items given with pounds of food provided looking at *daily* sums. I will even find the correlation coefficient. I will compare both the visualization and the correlation coefficient for the raw sum, as well as a log transformed version of the variables.
+```{r}
 # now explore relationship between clothes items and food pounds on a daily basis
 # find correlation coefficient, rounded to nearest 3 decimals
 round(cor(UMD_food$clothes_sum, UMD_food$food_pounds_sum, method = "pearson"), 3)
@@ -88,9 +119,15 @@ p2  <- UMD_food %>%
        x = "Log of daily summed clothes items", 
        y = "Log of daily summed food lbs") +
   annotate("text", x = 5, y = 2, label = "r = 0.769")
+```
 
+I can plot the graphs side by side like this using the `gridExtra` package:
+```{r}
 grid.arrange(p1, p2, nrow = 1)
+```
 
+Finally, I want to compare the relationship between these variables on a yearly basis. This is similar to the bar graph above, except I am using point data this time. 
+```{r}
 # Explore the relationship between clothes and food lbs on a yearly basis, notice positive trend
 # for most years
 UMD_food %>%
@@ -102,16 +139,6 @@ UMD_food %>%
        subtitle = "Data plotted by year", 
        x = "Log of sum of food lbs per day",
        y = "Log of clothing items per day") + theme_bw(base_size = 15) 
+```
 
-
-
-
-  
-  
-  
-  
-  
-  
-  
-
-
+There are some variables that I did not explore, like "average amount of people per day" (`ppl_avg`) and the "food pounds per person" (`lbs_per_prsn`), but I can do that in the next iteration of this project! 
