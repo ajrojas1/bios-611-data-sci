@@ -5,18 +5,19 @@ date: "9/25/2019"
 output: html_document
 ---
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(fig.width=12, fig.height=10, echo=TRUE, warning=FALSE, message=FALSE)
+knitr::opts_chunk$set(fig.width=11, fig.height=9, echo=FALSE, warning=FALSE, message=FALSE, results = "hide")
 ```
 
+## Introduction
+
 This project will be exploring a dataset from the Urban Ministries of Durham (UMD). UMD has provided a .TSV file with information of services provided for their clients over the past couple of decades. In this project I will be exploring two variables: the amount of food provided for clients (in pounds) and the number of clothing items provided. To do so, I will rely on the `tidyverse` and `dplyr` packages, as well as on `ggplot2` for visualization. To start, I will need to upload some packages before I can begin cleaning the data.
-```{r}
+
+```{r packages}
 library(dplyr)
 library(tidyr)
 library(stringr)
 library(tidyverse)
-# install.packages("GGally")
 library(GGally)
-# install.packages("gridExtra")
 library(gridExtra)
 
 # read in data, this Rmd is saved in my "scripts" folder and when I knit it reads automatically
@@ -25,7 +26,7 @@ UMD_data =  read_tsv("../data/UMD_Services_Provided_20190719.tsv")
 ```
 
 Let's take a look to see if the data was read in properly.
-```{r}
+```{r inspection}
 head(UMD_data)
 ```
 
@@ -35,7 +36,7 @@ Looks good!
 
 The first thing I notice is that some of the variables contain all NAs. Let's remove them.
 
-```{r}
+```{r remove-columns}
 # Check the `Field 1 - 3` variables, are they empty?
 # from: https://www.quora.com/How-do-I-get-a-frequency-count-based-on-two-columns-variables-in-an-R-dataframe
 summarise(group_by(UMD_data, `Field1`, `Field2`, `Field3`), count = n())
@@ -48,96 +49,222 @@ UMD_data2 <- UMD_data %>%
 Next, I want to change the date format so it is interpretable by R:
 
 
-```{r}
+```{r change-date-format}
 # change date format so R can interpret it
 UMD_data2$Date <- as.Date(UMD_data2$Date, "%m/%d/%Y")
 head(UMD_data$Date)
 ```
 
-The next thing I will do is to clean up the data using pipes and common functions from the `dplyr` package. This creates a new object `UMD_food` that has new variables, such as "Pounds per person", "Sum of Food Pounds", "Average People who Received Food", and "Sum of Clothes Items Given." These are given the variable names: `lbs_per_prsn`, `food_pounds_sum`, `ppl_avg`, and `clothes_sum`, respectively.
+The next thing I will do is to clean up the data using pipes and common functions from the `dplyr` package. This creates a new object `UMD_food` that has new variables, such as "Pounds per person", "Sum of Food Pounds", "Average People who Received Food", and "Sum of Clothes Items Given." These are given the variable names: `lbs_per_prsn`, `food_pounds_sum`, `ppl_avg`, and `clothes_sum`, respectively. 
 
-```{r}
-# clean data, select target variables, drop NAs, filter for 2000 - 2019, and group_by and summarise
+There are some outliers in the original variabel, `Food Pounds`, and I have chosen to drop the ones that are completely in another order of magnitude. There are only a few that are above 100 and one that is in the thousands, so I have excluded them from this analysis. `Food Provided For` had a similar issue, there were two values in the hundreds and one value in the thousands range. I have likewise dropped these three values for this analysis. 
+
+```{r data-cleaning}
+# search for outliers and remove
+outliers <- boxplot(UMD_data2$`Food Pounds`)$out
+
+# food data, select target variables, drop NAs, filter for 2000 - 2019, change date format
 UMD_food <- UMD_data2 %>% 
-  select(Date, `Client File Number`, `Food Provided for`, `Food Pounds`, `Clothing Items`) %>% 
-  drop_na(`Food Provided for`,`Food Pounds`, `Clothing Items`) %>%
-  filter(Date >= "2000-01-01", Date <= "2019-12-31", `Food Provided for` < 30, `Food Pounds` <= 25) %>%
+  select(Date, `Client File Number`, `Food Provided for`, `Food Pounds`) %>% 
+  drop_na(`Food Provided for`,`Food Pounds`) %>%
+  filter(Date >= "2000-01-01", Date <= "2019-12-31", `Food Pounds` < 100, `Food Provided for` < 100) %>%
+  separate(Date, into = c("Year", "Month", "Day"), sep = "-")
+
+# summarize data by group, count gets number of observations per day
+food_summary <- UMD_food %>%
+  group_by(Year, Month, Day) %>%
+  summarise(
+    count = n(),
+    lbs_per_prsn = sum(`Food Pounds`) / sum(`Food Provided for`),
+    food_pounds_sum = sum(`Food Pounds`, na.rm = TRUE),
+    ppl_sum = sum(`Food Provided for`, na.rm = TRUE),
+    ppl_avg = mean(`Food Provided for`, na.rm = TRUE)
+    )
+
+# clothes data, select relevant variables, change date format
+clths_smmry <- UMD_data2 %>%
+  select(Date, `Client File Number`, `Clothing Items`) %>%
+  drop_na(`Client File Number`, `Clothing Items`) %>%
+  filter(Date >= "2000-01-01", Date <= "2019-12-31") %>%
   separate(Date, into = c("Year", "Month", "Day"), sep = "-") %>%
-  group_by(Month, Year, Day) %>%
-  summarise(count = n(),
-            lbs_per_prsn = sum(`Food Pounds`) / sum(`Food Provided for`),
-            food_pounds_sum = sum(`Food Pounds`, na.rm = TRUE),
-            ppl_avg = mean(`Food Provided for`, na.rm = TRUE),
-            clothes_sum = sum(`Clothing Items`), na.rm= TRUE) %>%
-  filter(lbs_per_prsn > 0, food_pounds_sum > 0, ppl_avg > 0, clothes_sum > 0)
+  group_by(Year, Month) %>%
+  summarise(
+    count = n(),
+    sum_clths = sum(`Clothing Items`)
+  )
 ```
 
 # Plotting the data
 
-Now that I have cleaned up the data, I want to plot it. I want to look at the amount of food provided on a monthly basis from the year 2000 to 2019. I can do that like this:
-```{r}
-# Plotting yearly food lbs per year on a monthly basis, using bar graph, help from: 
-# https://www.earthdatascience.org/courses/earth-analytics/time-series-data/summarize-time-series-by-month-in-r/
-UMD_food %>% # Creat a variable using "Month" for the x-axis
-  mutate(month2 = as.Date(paste0("2019-", Month, "-01"), "%Y-%m-%d")) %>% 
-  ggplot(aes(x = month2, y = food_pounds_sum)) +
-  geom_bar(stat = "identity", fill = "darkslateblue") +
-  facet_wrap(~ Year, ncol = 4) +
-  labs(title = "Monthly Pounds of Food, 2000 - 2019",
-       subtitle = "Data plotted by year", 
-       x = "Month",
-       y = "Food Pounds") + theme_bw(base_size = 15) +
-  scale_x_date(date_labels = "%b")
-```
+Now that I have cleaned up the data, I want to plot it. I want to look at the amount of food provided and clothing items given on a monthly basis from the year 2000 to 2019. I can do that like this:
 
-Next, I can explore the relationship between clothing items given with pounds of food provided looking at *daily* sums. I will even find the correlation coefficient. I will compare both the visualization and the correlation coefficient for the raw sum, as well as a log transformed version of the variables.
-```{r}
+```{r plot-food-clths-over-time}
+############################# 
+# Plotting yearly food lbs per year on a monthly basis, using bar graph
+# Also plotting yearly clothing items on a montly basis, using bar graph
+# help from: 
+# https://www.earthdatascience.org/courses/earth-analytics/time-series-data/summarize-time-series-by-month-in-r/
+# create new monthly variable for bar graph
+# 2019 and 01 are dummy numbers, just trying to use format for month
+#############################
+
+# plot food pounds annually in a bar graph
+food_summary %>% 
+  mutate(month2 = as.Date(paste0("2019-", Month, "-01"), "%Y-%m-%d")) %>%
+  ggplot(mapping = aes(x = month2, y = food_pounds_sum)) +
+    geom_bar(stat = "identity", fill = "darkseagreen4") + 
+    facet_wrap(~ Year, ncol = 4) +
+    labs(title = "Monthly Pounds of Food, 2000 - 2019",
+         subtitle = "Data plotted by year", 
+         x = "Month",
+         y = "Food Pounds") + theme_bw(base_size = 15) +
+    scale_x_date(date_labels = "%b") 
+
+# plot clothing items annually in a bar graph
+clths_smmry %>%
+  mutate(month2 = as.Date(paste0("2019-", Month, "-01"), "%Y-%m-%d")) %>%
+  ggplot(mapping = aes(x = month2, y = sum_clths)) +
+    geom_bar(stat = "identity", fill = "darkslateblue") + 
+    facet_wrap(~ Year, ncol = 4) +
+    labs(title = "Clothes Items Provided, 2000 - 2019 (Monthly)",
+         subtitle = "Data plotted by year", 
+         x = "Month",
+         y = "Clothes Items") + theme_bw(base_size = 15) +
+    scale_x_date(date_labels = "%b")
+```
+The `Food Pounds` graph looks at total food pounds per month on a yearly basis. Overall, the trend has declined over the years. Does this mean less food has actually been provided over time? Or has there been a reduction in data collection more recently? A similar declining trend also occurs for `Clothing Items` where I plotted the amount of clothing items given per month on a yearly basis. For the graph descring clothing items, it seems as if the years 2002 to 2005 had the highest amounts of clothes provided.
+
+# Point Graphs
+
+Next, I look at the relationship between food and clothing items. The first pair of graphs look at the relationship of daily observations of `Food Pounds` and `Clothing Items` by taking the sum of each variable per day. In other words, I look at the total number of food pounds and clothing items grouped by `Date`. In addition to this plot, I explore the relationship between `Clothing Items` per daily visit and the aily `Food Pounds` per person.
+
+```{r plot-food-clothes}
+###########################
+# COMPARE CLOTHES and FOOD
+# create data frame containing food and clothes data together
+###########################
+food_clths <- UMD_data2 %>% 
+  select(Date, `Client File Number`, `Clothing Items`, `Food Pounds`, `Food Provided for`) %>%
+  drop_na(`Client File Number`, `Clothing Items`, `Food Pounds`, `Food Provided for`) %>%
+  filter(Date >= "2000-01-01", Date <= "2019-12-31", `Food Pounds` < 100) 
+
+# Summary table of food_clths grouped by Date
+food_clths_smry <- food_clths %>%
+  group_by(Date) %>%
+  summarise(
+    count = n(),
+    sum_food = sum(`Food Pounds`),
+    sum_clths = sum(`Clothing Items`),
+    sum_ppl_food = sum(`Food Provided for`),
+    food_per_prsn = sum_food / sum_ppl_food,
+    clths_per_vist = sum_clths / count
+  )
+
 # now explore relationship between clothes items and food pounds on a daily basis
 # find correlation coefficient, rounded to nearest 3 decimals
-round(cor(UMD_food$clothes_sum, UMD_food$food_pounds_sum, method = "pearson"), 3)
+round(cor(food_clths_smry$sum_clths, food_clths_smry$sum_food, method = "pearson"), 3)
 
 # plot sums of clothes and food pounds
-p1 <- UMD_food %>% 
-  ggplot(aes(x = clothes_sum, y = food_pounds_sum)) +
+p1 <- food_clths_smry %>% 
+  ggplot(aes(x = sum_clths, y = sum_food)) +
+    geom_point(color = "darkslateblue", alpha = 1/3, position = "jitter") +
+    geom_smooth(se = FALSE, color = "deeppink3") +
+    labs(title = "Daily Sums of Clothes Items\nand Food lbs, 2000 - 2019",
+         subtitle = "Each observation is one day", 
+         x = "Sum of clothes items",
+         y = "Sum of food lbs.") +
+     annotate("text", x = 150, y = 30, label = "r = 0.786")
+
+# Normalize the variables
+
+# correlation coefficient of food/person and clothes/visit
+round(cor(food_clths_smry$food_per_prsn, food_clths_smry$clths_per_vist, 
+          method = "pearson", use = "complete.obs"), 3)
+
+# plot food per person & and clothes per visit
+p2  <- food_clths_smry %>% 
+  ggplot(aes(x = clths_per_vist, y = food_per_prsn)) +
     geom_point(color = "darkslateblue", alpha = 1/3) +
     geom_smooth(se = FALSE, color = "deeppink3") +
-    labs(title = "Daily Sums of Clothes Items\n and Food lbs, 2000 - 2019",
-         x = "Sum of clothes Items per day",
-         y = "Sum of food lbs per day") +
-    annotate("text", x = 150, y = 50, label = "r = 0.786")
+    labs(title = "Daily Clothing Items and Food Pounds \nper Person, 2000 - 2019",
+         subtitle = "Each observation is for one day",
+         x = "Sum of clothing items per daily visits \n(multiple clients)", 
+         y = "Food lbs. provided per person") +
+    annotate("text", x = 30, y = 2.5, label = "r = - 0.484")
 
-# correlation coefficient, log transformed
-round(cor(log2(UMD_food$clothes_sum),log2(UMD_food$food_pounds_sum)), 3)
-
-# same variables, but log transformed
-p2  <- UMD_food %>% 
-  ggplot(aes(x = log2(clothes_sum), y = log2(food_pounds_sum))) +
-  geom_point(color = "darkslateblue", alpha = 1/3) +
-  geom_smooth(se = FALSE, color = "deeppink3") +
-  labs(title = "Sums of Clothes Items and Food lbs \n(Log Transformed), 2000 - 2019",
-       x = "Log of daily summed clothes items", 
-       y = "Log of daily summed food lbs") +
-  annotate("text", x = 5, y = 2, label = "r = 0.769")
 ```
 
 I can plot the graphs side by side like this using the `gridExtra` package:
-```{r}
+```{r grid-arrange}
 grid.arrange(p1, p2, nrow = 1)
 ```
 
-Finally, I want to compare the relationship between these variables on a yearly basis. This is similar to the bar graph above, except I am using point data this time. 
-```{r}
-# Explore the relationship between clothes and food lbs on a yearly basis, notice positive trend
-# for most years
-UMD_food %>%
-  ggplot(aes(x = log2(clothes_sum), y = log2(food_pounds_sum))) +
-  geom_point(color = "darkslateblue") +
+The first thing to note is that the relationship between the sume of pounds of food and clothing items by day is slightly positive. On the other hand, the relationship between clothing items per daily visit and the daily food pounds per person is negative. 
+
+This went against my expectation since the first graph showed a positive correlation between total sum of food and clothing per day. Instead, it seems like the less clothing items handed out meant the more food was given that day. I would have assumed that daily food pounds per person would also be positively correlated with the amount of clothing items given per number of daily visits. 
+
+I want to verify whether this kind of relationship exists when we group by clients. Perhaps the opposing trend will go away if we group differently. 
+
+```{r food-clothes-by-client}
+
+# Summary of food_clths table grouped by Client
+client_smry <- food_clths %>%
+  group_by(`Client File Number`) %>%
+  summarise(
+    count = n(),
+    sum_food = sum(`Food Pounds`),
+    sum_clths = sum(`Clothing Items`),
+    sum_ppl_food = sum(`Food Provided for`),
+    food_per_prsn = sum_food / sum_ppl_food,
+    clths_per_clnt = sum_clths / count
+  )
+
+# find correlation coefficient for sum of clothes and food per client 
+round(cor(client_smry$sum_clths, client_smry$sum_food, 
+          method = "pearson", use = "complete.obs"), 3)
+
+p3 <- client_smry %>% 
+  ggplot(aes(x = sum_clths, y = sum_food)) +
+  geom_point(color = "darkslateblue", alpha = 1/3, position = "jitter") +
   geom_smooth(se = FALSE, color = "deeppink3") +
-  facet_wrap(~ Year, ncol = 4) +
-  labs(title = "Logged Clothing Items & Food Pounds per day, 2000 - 2019",
-       subtitle = "Data plotted by year", 
-       x = "Log of sum of food lbs per day",
-       y = "Log of clothing items per day") + theme_bw(base_size = 15) 
+  labs(title = "Sums of Clothes Items and Food lbs \nper Client Number, 2000 - 2019",
+       subtitle = "Each observation is one client", 
+       x = "Sum of clothes items",
+       y = "Sum of food lbs.") +
+  annotate("text", x = 1000, y = 100, label = "r = 0.924")
+
+# Normalize the variables
+
+# correlation coefficient, log transformed
+round(cor(client_smry$clths_per_clnt, client_smry$food_per_prsn, 
+          method = "pearson", use = "complete.obs"), 3)
+
+# same variables, but log transformed
+p4  <- client_smry %>% 
+  ggplot(aes(x = clths_per_clnt, y = food_per_prsn)) +
+  geom_point(color = "darkslateblue", alpha = 1/3) +
+  geom_smooth(se = FALSE, color = "deeppink3") +
+  labs(title = "Clothing Items and Food lbs per Person \for each Client Number, 2000 - 2019",
+       subtitle = "Each observation is for one client",
+       x = "Sum of clothing items per visit \n(for one client)", 
+       y = "Food lbs. provided per person")  +
+  annotate("text", x = 30, y = 12, label = "r = - 0.419")
+
+# side-by-side plot
+grid.arrange(p3, p4, nrow = 1)
 ```
 
-There are some variables that I did not explore, like "average amount of people per day" (`ppl_avg`) and the "food pounds per person" (`lbs_per_prsn`), but I can do that in the next iteration of this project! 
+As expected, the relationship between total sums of food and clothes is highly positive when we look at each client. But, the relationship between food per person and clothing item per client is negative. So, it seems like the less clothes a client receives means they usually get more food, and vice versa. 
+
+The next thing I should do is determine whether this relationship is significant. During another iteration of this project, I can test for this. 
+
+## Conclusion
+
+Over time, the monthly amoung of food pounds and clothing items has reduced over time. We can observe this in the yearly bar graphs that show the sum of food and clothes on a monthly basis. 
+
+On a daily basis, the sum of food pounds and clothing items are positively correlated. However, the sum of food pounds per person and the sum of clothing items given per daily visit is negative. 
+
+When looking at this relationship grouped by `Client Number`, it remains the same. We can tentatively conclude that the less clothing items someone receives, the more food they may receive per person. 
+
+We cannot conclude this without further statistical ananlyses, which can be done at a later iteration of this project. 
+
