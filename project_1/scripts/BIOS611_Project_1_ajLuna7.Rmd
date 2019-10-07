@@ -1,16 +1,25 @@
 ---
 title: 'Project 1: Urban Ministries of Durham Data'
 author: "Alfredo Rojas"
-date: "9/25/2019"
+date: "10/07/2019"
 output: html_document
 ---
 ```{r global_options, include=FALSE}
-knitr::opts_chunk$set(fig.width=11, fig.height=9, echo=FALSE, warning=FALSE, message=FALSE, results = "hide")
+knitr::opts_chunk$set(fig.width=10, fig.height=8, echo=FALSE, warning=FALSE, message=FALSE, results = "hide")
 ```
 
 ## Introduction
 
-This project will be exploring a dataset from the Urban Ministries of Durham (UMD). UMD has provided a .TSV file with information of services provided for their clients over the past couple of decades. In this project I will be exploring two variables: the amount of food provided for clients (in pounds) and the number of clothing items provided. To do so, I will rely on the `tidyverse` and `dplyr` packages, as well as on `ggplot2` for visualization. To start, I will need to upload some packages before I can begin cleaning the data.
+This project will be exploring a dataset from the Urban Ministries of Durham (UMD). UMD has provided a .TSV file with information of services provided for their clients over the past couple of decades. In this project I will be exploring two variables: the amount of food provided for clients (in pounds) and the number of clothing items provided.
+
+My questions are:
+
+### Q1: How has the amount of food and clothing items changed over the years?
+### Q2: What is the relationship between food and clothing items provided per day and by client? 
+
+To do so, I will rely on the `tidyverse` and `dplyr` packages, as well as on `ggplot2` for visualization. To start, I will need to upload some packages before I can begin cleaning the data.
+
+
 
 ```{r packages}
 library(dplyr)
