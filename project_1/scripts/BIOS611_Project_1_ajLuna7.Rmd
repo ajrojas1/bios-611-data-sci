@@ -2,7 +2,8 @@
 title: 'Project 1: Urban Ministries of Durham Data'
 author: "Alfredo Rojas"
 date: "10/07/2019"
-output: html_document
+output:
+  html_document: default
 ---
 ```{r global_options, include=FALSE}
 knitr::opts_chunk$set(fig.width=10, fig.height=8, echo=FALSE, warning=FALSE, message=FALSE, results = "hide")
@@ -143,6 +144,8 @@ clths_smmry %>%
 ```
 The `Food Pounds` graph looks at total food pounds per month on a yearly basis. Overall, the trend has declined over the years. Does this mean less food has actually been provided over time? Or has there been a reduction in data collection more recently? A similar declining trend also occurs for `Clothing Items` where I plotted the amount of clothing items given per month on a yearly basis. For the graph descring clothing items, it seems as if the years 2002 to 2005 had the highest amounts of clothes provided.
 
+#### Takeaway: Food Items have increased over the years but plateued a bit. Clothing items increased then decreased. 
+
 # Point Graphs
 
 Next, I look at the relationship between food and clothing items. The first pair of graphs look at the relationship of daily observations of `Food Pounds` and `Clothing Items` by taking the sum of each variable per day. In other words, I look at the total number of food pounds and clothing items grouped by `Date`. In addition to this plot, I explore the relationship between `Clothing Items` per daily visit and the aily `Food Pounds` per person.
@@ -204,9 +207,12 @@ p2  <- food_clths_smry %>%
 ```
 
 I can plot the graphs side by side like this using the `gridExtra` package:
+
 ```{r grid-arrange}
 grid.arrange(p1, p2, nrow = 1)
 ```
+
+#### Takeaway 2: Total food pounds per day and clothing items per day are positively correlated. But the more food lbs/person for each day means less total clothing items per daily visits, and vice versa.  
 
 The first thing to note is that the relationship between the sume of pounds of food and clothing items by day is slightly positive. On the other hand, the relationship between clothing items per daily visit and the daily food pounds per person is negative. 
 
@@ -263,13 +269,15 @@ p4  <- client_smry %>%
 grid.arrange(p3, p4, nrow = 1)
 ```
 
+#### Takeway 3: Total food pounds per client and total clothing items for client are positively correlated. IBut the more food lbs/person a client receives means the less clothing items they receive per visit, and vice versa. 
+
 As expected, the relationship between total sums of food and clothes is highly positive when we look at each client. But, the relationship between food per person and clothing item per client is negative. So, it seems like the less clothes a client receives means they usually get more food, and vice versa. 
 
 The next thing I should do is determine whether this relationship is significant. During another iteration of this project, I can test for this. 
 
 ## Conclusion
 
-Over time, the monthly amoung of food pounds and clothing items has reduced over time. We can observe this in the yearly bar graphs that show the sum of food and clothes on a monthly basis. 
+Over time, the monthly amoung of food pounds and clothing items has increased over time. We can observe this in the yearly bar graphs that show the sum of food and clothes on a monthly basis. 
 
 On a daily basis, the sum of food pounds and clothing items are positively correlated. However, the sum of food pounds per person and the sum of clothing items given per daily visit is negative. 
 
