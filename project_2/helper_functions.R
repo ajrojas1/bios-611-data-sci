@@ -20,7 +20,7 @@ load_data = function(x) {
     separate(Date, into = c("Year", "Month", "Day"), sep = "-")
   
   food_summary <- umd_food %>%
-    group_by(Year, Month, Day) %>%
+    group_by(Year, Month) %>%
     summarise(
       count = n(),
       lbs_per_prsn = sum(`Food Pounds`) / sum(`Food Provided for`),
@@ -39,11 +39,29 @@ food_plot = function(x, y) {
   x %>% 
     mutate(month2 = as.Date(paste0("2019-", Month, "-01"), "%Y-%m-%d")) %>%
     ggplot(mapping = aes(x = month2, y = food_pounds_sum)) +
-    geom_bar(stat = "identity", fill = "darkseagreen4") + 
-    labs(title = paste0("Monthly Pounds of Food,", y),
+    geom_bar(stat = "identity", fill = "purple") + 
+    labs(title = paste0("Monthly Pounds of Food: ", y),
          subtitle = "Data plotted by year", 
          x = "Month",
          y = "Food Pounds") + theme_bw(base_size = 15) +
-    scale_x_date(date_labels = "%b") 
+    scale_x_date(
+      limits = c(as.Date("2019-01-01"), as.Date("2019-12-01")), 
+      date_minor_breaks = "1 month", 
+      date_labels = "%b") # this last function creates the missing months for visual purposes
   
 }
+visits_plot <- function(x, y){
+  x %>%
+    mutate(month2 = as.Date(paste0("2019-", Month, "-01"), "%Y-%m-%d")) %>%
+    ggplot(mapping = aes(x = month2, y = count)) +
+    geom_point() + 
+    geom_line() +
+    labs(title = paste0("Visits per month: ", y),
+         subtitle = "Data plotted by year", 
+         x = "Month",
+         y = "Visits per Month") + theme_bw(base_size = 15) +
+    scale_x_date(
+      limits = c(as.Date("2019-01-01"), as.Date("2019-12-01")), 
+      date_minor_breaks = "1 month", 
+      date_labels = "%b") # this last function creates the missing months for visual purposes
+} 

@@ -14,7 +14,8 @@ data_food = load_data("data/UMD_Services_Provided_20190719.tsv")
 
 ui = dashboardPage(
   
-  dashboardHeader(title = "Urban Ministries of Durham Data Exploration"),
+  dashboardHeader(title = "Urban Ministries of Durham Data Exploration",
+                  titleWidth = 350),
   dashboardSidebar(),
   
   # plot in main body ---
@@ -23,10 +24,15 @@ ui = dashboardPage(
     # row-based layout for plot ---
     fluidRow(
       
-      # first box with plot ---
-      box(title = "Monthly Pounds of Food", status = "primary", plotOutput("plot1", height = 250)),
+      # first and second boxes with plots ---
+      box(title = "Food Barplot", status = "primary", plotOutput("plot1", height = 250)),
+      box(title = "Visitors Line Graph", status = "primary", plotOutput("plot2", height = 250))
+    
+      ),
+    
+    fluidRow(
       
-      # Second box for select input ---
+      # Third box for select input ---
       box(
         title = "Select", status = "warning", 
         "You can select which year", br(), "you want to see", 
@@ -51,6 +57,16 @@ server = function(input, output) {
     
     # use food_plot() from helper_functions.R ---
     food_plot(current_data, input$select)
+
+  })
+  
+  output$plot2 = renderPlot({
+    
+    # used data based on selection from reactive --
+    current_data = react_data()
+    
+    # use visits_plot() from helper_functions.R---
+    visits_plot(current_data, input$select)
   })
   
 }
