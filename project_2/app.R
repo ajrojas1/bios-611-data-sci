@@ -5,18 +5,21 @@
 library(tidyverse)
 library(shiny)
 library(shinydashboard)
+library(rsconnect)
 source("helper_functions.R")
 
+# read in data
 data_food = load_data("data/UMD_Services_Provided_20190719.tsv")
 
-# Some ideas: Maybe at the very least, have two options on a side bar for two plots (depending on
-# different data.frames. . . For each plot, have the user select variables to visualize)
-
+# User interface
 ui = dashboardPage(
   
-  dashboardHeader(title = "Urban Ministries of Durham Data Exploration",
-                  titleWidth = 350),
-  dashboardSidebar(),
+  # Header w/ title ---
+  dashboardHeader(title = "Urban Ministries of Durham: Food Data",
+                  titleWidth = 400),
+  
+  # remove sidebar for this app
+  dashboardSidebar(disable = TRUE),
   
   # plot in main body ---
   dashboardBody(
@@ -24,24 +27,39 @@ ui = dashboardPage(
     # row-based layout for plot ---
     fluidRow(
       
-      # first and second boxes with plots ---
+      # first box with plots ---
       box(title = "Food Barplot", status = "primary", plotOutput("plot1", height = 250)),
-      box(title = "Visitors Line Graph", status = "primary", plotOutput("plot2", height = 250))
-    
-      ),
+      
+      # Tab box with plots 2 and 3 line graphs ---
+      tabBox(
+        tabPanel(title = "Visitors Line Graph", status = "primary", plotOutput("plot2", height = 250)),
+        tabPanel(title = "Sum of People Receiving Food", status = "primary", plotOutput("plot3", height = 250))
+      )
+    ),
     
     fluidRow(
-      
+
       # Third box for select input ---
       box(
-        title = "Select", status = "warning", 
-        "You can select which year", br(), "you want to see", 
-        selectInput(inputId = "select", label = "Choose Year", choices = 2000:2019)
+        title = "Select Year", status = "warning",
+        # "You can select which year you want to see",
+        selectInput(inputId = "select", label = "Choose Year for Monthly Data", 
+                    choices = 2000:2019, selectize = FALSE)
+      ),
+      
+      # Fourth box for description of data ---
+      box(
+        title = "Description of Data", width = 6, background = "light-blue",
+        "UMD has collected data on food distribution over the years. 
+        Food pounds have been recorded, as well as amount of people for whom food was provided.
+        Choose a year to see monthly observations. Some years do not contain data. 
+        What trends can you notice over the years?"
       )
     )
   )
 )
 
+# server function
 server = function(input, output) {
   
   # reactive data based on year selection ---
@@ -67,6 +85,15 @@ server = function(input, output) {
     
     # use visits_plot() from helper_functions.R---
     visits_plot(current_data, input$select)
+  })
+  
+  output$plot3 = renderPlot({
+    
+    # used data based on selection from reactive --
+    current_data = react_data()
+    
+    # use food_provided() from helper_functions.R---
+    food_provided(current_data, input$select)
   })
   
 }

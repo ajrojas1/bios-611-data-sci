@@ -33,35 +33,49 @@ load_data = function(x) {
   
 }
 
-food_plot = function(x, y) {
+food_plot = function(data, year) {
   
   # plot food pounds annually in a bar graph
-  x %>% 
+  data %>% 
     mutate(month2 = as.Date(paste0("2019-", Month, "-01"), "%Y-%m-%d")) %>%
     ggplot(mapping = aes(x = month2, y = food_pounds_sum)) +
-    geom_bar(stat = "identity", fill = "purple") + 
-    labs(title = paste0("Monthly Pounds of Food: ", y),
-         subtitle = "Data plotted by year", 
+    geom_bar(stat = "identity", fill = "darkorchid4") + 
+    labs(title = paste0("Monthly Pounds of Food: ", year),
          x = "Month",
          y = "Food Pounds") + theme_bw(base_size = 15) +
     scale_x_date(
-      limits = c(as.Date("2019-01-01"), as.Date("2019-12-01")), 
+      #limits = c(as.Date("2019-01-01"), as.Date("2019-12-31")), (this was excluding Jan & Dec ?? leave out)
       date_minor_breaks = "1 month", 
       date_labels = "%b") # this last function creates the missing months for visual purposes
   
 }
-visits_plot <- function(x, y){
-  x %>%
+visits_plot = function(data, year){
+  data %>%
     mutate(month2 = as.Date(paste0("2019-", Month, "-01"), "%Y-%m-%d")) %>%
     ggplot(mapping = aes(x = month2, y = count)) +
     geom_point() + 
     geom_line() +
-    labs(title = paste0("Visits per month: ", y),
-         subtitle = "Data plotted by year", 
+    labs(title = paste0("Visits per month: ", year),
          x = "Month",
          y = "Visits per Month") + theme_bw(base_size = 15) +
     scale_x_date(
       limits = c(as.Date("2019-01-01"), as.Date("2019-12-01")), 
-      date_minor_breaks = "1 month", 
+      date_minor_breaks = "2 weeks", 
       date_labels = "%b") # this last function creates the missing months for visual purposes
 } 
+
+food_provided = function(data, year) {
+  
+  data %>%
+    mutate(month2 = as.Date(paste0("2019-", Month, "-01"), "%Y-%m-%d")) %>%
+      ggplot(mapping = aes(x = month2, y = ppl_sum)) +
+      geom_point() + 
+      geom_line() +
+      labs(title = paste0("Sum of People Receiving Food: ", year),
+           x = "Month",
+           y = "Food Provided for") + theme_bw(base_size = 15) +
+      scale_x_date(
+        limits = c(as.Date("2019-01-01"), as.Date("2019-12-01")), 
+        date_minor_breaks = "1 month", 
+        date_labels = "%b") # this last function creates the missing months for visual purposes
+}
