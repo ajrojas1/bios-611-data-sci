@@ -2,3 +2,4 @@
 .DS_store
 
 # Ignore R history files
+.Rhistory
