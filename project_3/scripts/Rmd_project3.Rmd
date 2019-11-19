@@ -1,0 +1,52 @@
+---
+title: "Project 3"
+author: "Alfredo Rojas"
+date: "11/18/2019"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=7, fig.height=5, echo=FALSE, warning=FALSE, message=FALSE, results = "hide")
+```
+
+## Urban Ministries of Durham
+
+Urban Ministries of Durham (UMD) is a non-profit organization that provides services for homeless families and individuals. In this project, I will use UMD's data to visualize the demographic information that makes up UMD's clients. Another component of this project will include the spatial distribution of race and ethnicity within Durham county's sub-divisions, so that this data may be compared to UMD's client data. 
+
+This project will use information recorded of UMD's client's ethnicity and race, as well as 3rd party demographic and spatial data to visualize Durham's county's demographic information.
+
+## Visualize Client Demographic Data (Work in progress)
+
+Part of this project will explore the demographic statistics of Urban Ministries of Durham's client data. 
+
+```{r packages}
+library(tidyverse)
+library(ggplot2)
+
+client_data = read.csv("client_data.csv")
+
+```
+
+
+Initial Bar plots
+
+```{r pressure, echo=FALSE}
+
+client_data %>% ggplot(mapping = aes(x = Client.Primary.Race)) +
+  geom_bar() +
+    labs(title = "Client Primary Race Bar Graph",
+    x = "Client Primary Race",
+    y = "Count") +
+  theme(text = element_text(size = 12), 
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+client_data %>% ggplot(mapping = aes(x = Client.Ethnicity)) +
+  geom_bar() +
+  labs(title = "Client Ethnicity Bar Graph",
+    x = "Client Primary Race",
+    y = "Count") +
+  theme(text = element_text(size = 12), 
+        axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+### NOTE: I have not started the spatial analysis yet and plan on doing so in the near future. This is just my initial draft
