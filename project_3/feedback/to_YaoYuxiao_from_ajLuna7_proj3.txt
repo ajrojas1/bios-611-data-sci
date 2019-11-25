@@ -1,0 +1,37 @@
+## feedback from ajLuna7 on project 3
+
+##Overall feedback: 
+--The graphs look very nice and the code is extensive. However both the graphs and the code need to be documented in some way. Explain to both programmers and non-programmers what you are doing in your project, like explain to UMD employees what your graphs mean, and explain to other data scientists what your code is doing for each file and code-chunk. Overall, the visualizations are appropriate and effective. I look forward to seeing what the final result is! Good work so far! 
+
+1. Is the project organized modularly, with Make as the workflow manager?
+--The project contains the necessary components of code. However, there is no Makefile.
+
+2. Does the project use both Python (Pandas specifically) and R (Tidyverse specifically) scripts?
+--Yes, both languages are used.
+
+3. Is Docker used to define execution environments appropriately?
+--No.
+
+4. Are the plots appropriate for the data types, the hypotheses being tested, and the points being communicated?
+--The plots need explanation. For example, what is the meaning and interpretation of the first plot in your RMarkdown file, Age and Gender? Why does the x-axis have negative values? If there is a purpose for this, then it should be explained clearly. 
+
+5. How can the project be organized or documented more clearly?
+--In the report, the graphs need explanation. The code works, but it should be documented more clearly. Explain what each chunk of code is coding in both R and Python. This is important for other programmers who may be interested in how you created some graphs. 
+
+6. Is the purpose of the project communicated clearly?
+--The questions are stated clearly, but the purpose is unclear. What is it you are trying to answer? Why? Why should UMD find this analysis important? 
+
+7. Does the purpose of the project make sense from the client’s point of view? How could the project better serve the client?
+--Without explanations for graphs, the project does not make sense. The visualizations are very nice, but the audience needs context. Nice work on the graphs! 
+
+8. Is the source of the data made clear? (Remember that this project can be part of your public portfolios, so people not familiar with UMD may see it).
+--Yes.
+
+9. Is the interpretation of figures clearly explained?
+--No.
+
+10. Is the purpose and interpretation of analysis steps clearly communicated?
+--No, take some time to describe your methodology and how your methodology relates to your questions? Why did you choose to visualize things the way you did? How do your viz choices connect to your questions? 
+
+11. Are overall take-home messages clearly communicated?
+--No. 

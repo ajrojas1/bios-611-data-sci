@@ -1,5 +1,4 @@
 ## Data
-i
 Urban Ministries of Durham Data about patient demgoraphics, income, and health insurance
 
 ## Concept
