@@ -1,0 +1,31 @@
+Hello ajLuna7,
+
+Your project looks good by now. The structure is well organized and you did an excellent job in data wrangling. 
+
+1. Is the project organized modularly, with Make as the workflow manager?
+This part has not been finished yet.
+
+2. Does the project use both Python (Pandas specifically) and R (Tidyverse specifically) scripts?
+Yes, the author used pandas to do data wrangling and R to visualize.
+
+3. Is Docker used to define execution environments appropriately?
+This part has not been finished yet.
+
+4. Are the plots appropriate for the data types, the hypotheses being tested, and the points being communicated?
+Yes, the plots make sense to illustrate the data.
+
+5. How can the project be organized or documented more clearly?
+The README file could be more specific, like lists the purpose of project and questions to be answered.
+
+6. Is the purpose of the project communicated clearly?
+Not yet, the README does not state the purpose clearly.
+
+7. Does the purpose of the project make sense from the client’s point of view? How could the project better serve the client?
+Not sure.
+
+8. Is the source of the data made clear? (Remember that this project can be part of your public portfolios, so people not familiar with UMD may see it).
+It could be more clear, like you may introduce UMD briefly.
+
+Some suggestion:
+
+It sounds great that you adopt some external data to explore demographic information across Durham county using spatial data, maybe you could make it more specific when demonstrating data source.

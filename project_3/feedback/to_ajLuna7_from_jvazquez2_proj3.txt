@@ -1,0 +1,45 @@
+Provide feedback about the following topics:
+
+1. Is the project organized modularly, with Make as the workflow manager?
+
+No Male file but project has both R and python scripts.
+
+2. Does the project use both Python (Pandas specifically) and R (Tidyverse specifically) scripts?
+
+Pandas was used in python and tidyverse to create the plots.
+
+3. Is Docker used to define execution environments appropriately?
+
+You have your docker filer but you didn't intall anything. You can just call a premade docker that has R and python. You can use the one that I have in my make file which has pandas and tidyverse.
+
+4. Are the plots appropriate for the data types, the hypotheses being tested, and the points being communicated?
+
+You mentioned that your project is not done yet but so far you've made two plots. I would suggest combining the ones that you have into one. You can make race 3 categories 'blaack, white, other' and next to it but the number of non-hispanics as an additional bar. 
+
+5. How can the project be organized or documented more clearly?
+
+I think once you have your make file everything will be organized more clearly but you should add a feed folder for people to put their feedback.
+
+6. Is the purpose of the project communicated clearly?
+
+Methods were explained but not why this is important.
+
+7. Does the purpose of the project make sense from the client’s point of view? How could the project better serve the client?
+
+I think you should elaborate on this.
+
+8. Is the source of the data made clear? (Remember that this project can be part of your public portfolios, so people not familiar with UMD may see it).
+
+A description of the data was included but no mention of how people can access the data or learn more about it.
+
+9. Is the interpretation of figures clearly explained?
+
+No description of the tables was made.
+
+10. Is the purpose and interpretation of analysis steps clearly communicated?
+
+No purpose or interpretation of the analysis steps was communicated.
+
+11. Are overall take-home messages clearly communicated?
+
+I think overall the purpose of the project will be to use other information to see if location of affects the type of homeless people the shelter attracts. I can see how this can be important but should be communicated when writting the final report.
