@@ -5,7 +5,7 @@
 library(tidyverse)
 library(ggplot2)
 
-client_data = read.csv("client_data.csv")
+client_data = read.csv("scripts/client_data.csv")
 head(client_data)
 
 client_data %>% ggplot(mapping = aes(x = Client.Primary.Race)) +
