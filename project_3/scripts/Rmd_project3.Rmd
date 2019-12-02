@@ -2,7 +2,9 @@
 title: "Project 3"
 author: "Alfredo Rojas"
 date: "11/18/2019"
-output: html_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r global_options, include=FALSE}
@@ -11,28 +13,34 @@ knitr::opts_chunk$set(fig.width=7, fig.height=5, echo=FALSE, warning=FALSE, mess
 
 ## Urban Ministries of Durham
 
-Urban Ministries of Durham (UMD) is a non-profit organization that provides services for homeless families and individuals. In this project, I will use UMD's data to visualize the demographic information that makes up UMD's clients. Another component of this project will include the spatial distribution of race and ethnicity within Durham county's sub-divisions, so that this data may be compared to UMD's client data. 
+Urban Ministries of Durham (UMD) is a non-profit organization that provides services for homeless families and individuals. In this project, I will use UMD's data to visualize the demographic information that makes up UMD's clients. Another component of this project will include the spatial distribution of race and ethnicity within Durham county's census tracts, so that this data may be compared to UMD's client data. 
 
 This project will use information recorded of UMD's client's ethnicity and race, as well as 3rd party demographic and spatial data to visualize Durham's county's demographic information.
 
-## Visualize Client Demographic Data (Work in progress)
+## Background and Data
+The data comes from Urban Ministries of Durham (UMD). It is about patient demgoraphics, income, and health insurance.This project also relies on data from the U.S. Census Bureau. 
 
-Part of this project will explore the demographic statistics of Urban Ministries of Durham's client data. 
+This project focues on two kinds of data: (1) Client-based data on demographics, specifically race from UMD; and (2) spatial data, the percentage of black and white populations per census tract from U.S. census data.
 
-```{r packages}
-library(tidyverse)
-library(ggplot2)
+## Methods
+This project analyzes demographic data provided by UMD to describe the demographic makeup of UMD's clients. Additionally, external data will be used to explore demographic information across Durham county using spatial data. The analysis includes descriptive statistics to visualize data. Currently, no statistical analyses have been performed.
 
-client_data = read.csv("client_data.csv")
-entry_exit = read.csv("entry_exit.csv")
+## Study Context
+This study focuses on Durham, NC at the census-tract level, as well as the client level according to UMD's data.
 
+```{r, echo=FALSE}
+nc_map
 ```
 
+## Demographics by census tract in Durham, NC
+This next graph displays demographic distribution of Black populations and White populations by census tract. Accoding to the visualization, more census-tracts are populated by White populations and exist within central Durham. Black populations are fewer and are distributed around central Durham, outside of where UMD is located.
 ```{r}
-
+tmap_arrange(map_white, map_black, outer.margins = 0.1)
+print(reference, vp = grid::viewport(0.5, 0.09, width = 0.15, height = 0.15))
 ```
 
-Initial Bar plots exploring distribution of UMD clients by race and ethnicity. 
+
+## Bar plots exploring distribution of UMD clients by race and ethnicity. 
 
 ```{r pressure, echo=FALSE}
 
@@ -53,3 +61,6 @@ client_data %>% ggplot(mapping = aes(x = Client.Ethnicity)) +
         axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
+
+## Conclusion
+Clients at UMD are primarily African-American/Black, with White the second largest population. Spatially, White populations predominate across Durham county by percentage and occupy central areas of Durham county. Black populations by percentage are fewer and exist in surrounding areas.
