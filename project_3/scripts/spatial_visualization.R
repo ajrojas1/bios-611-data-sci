@@ -121,10 +121,16 @@ nc_map = tm_shape(nc_state) +
   tm_layout(main.title = "North Carolina (Durham outline in red)",
             main.title.size = 1)
 
-png("map.png")
+# Output images: kind of messy
+jpeg("nc.jpg", res = 300, units = "in", width = 5, height = 5)
+nc_map
+dev.off()
+
 tmap_arrange(map_white, map_black, outer.margins = 0.1)
 print(reference, vp = grid::viewport(0.5, 0.1, width = 0.17, height = 0.17))
-dev.off()
+
+# jpeg("map_3.tiff", units = "in", width = 5, height = 5, res = 300)
+
 
 
 
