@@ -24,11 +24,15 @@ library(tidyverse)
 library(ggplot2)
 
 client_data = read.csv("client_data.csv")
+entry_exit = read.csv("entry_exit.csv")
 
 ```
 
+```{r}
 
-Initial Bar plots
+```
+
+Initial Bar plots exploring distribution of UMD clients by race and ethnicity. 
 
 ```{r pressure, echo=FALSE}
 
@@ -49,4 +53,3 @@ client_data %>% ggplot(mapping = aes(x = Client.Ethnicity)) +
         axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-### NOTE: I have not started the spatial analysis yet and plan on doing so in the near future. This is just my initial draft
