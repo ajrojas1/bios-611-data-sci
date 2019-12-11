@@ -19,7 +19,7 @@ fgdb = "ACS_2017_5YR_TRACT_37_NORTH_CAROLINA.gdb"
 # List all feature classes in a file geodatabase
 subset(st_drivers(), grepl("GDB", name))
 fc_list = st_layers(fgdb)
-print(fc_list) # print list of layers
+# print(fc_list) # print list of layers
 
 nc_shp = st_read(dsn = fgdb, layer = "ACS_2017_5YR_TRACT_37_NORTH_CAROLINA")
 race_data = st_read(dsn = fgdb, layer = "X02_RACE")
@@ -58,9 +58,9 @@ usa_shp = readRDS("gadm36_USA_2_sf.rds")
 durham = usa_shp %>% 
   filter(NAME_1 == "North Carolina", NAME_2 == "Durham")
 
-plot(st_geometry(durham))
+# plot(st_geometry(durham))
 
-st_crs(durham) # EPSG: 4326
+# st_crs(durham) # EPSG: 4326
 nc_race_proj = st_transform(nc_race, crs = 4326)
 ### ###
 
