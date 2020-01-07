@@ -1,9 +1,0 @@
-** Project 3 Grade
-
-   Average Feedback Score - 15/15
-   Average Presentation  Score - 80.5/100
-   Grader Score - 20/30: -10 make target does not work (Makefile:15: recipe for target 'scripts/map.png' failed) 
-   
-   Final Grade - 78.58
-   
-
