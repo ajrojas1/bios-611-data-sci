@@ -12,4 +12,4 @@ scripts/build-docker: scripts/ACS_2017_5YR_TRACT_37.gdb.zip
 	docker build -t ajr . && touch build-docker
 
 scripts/map.png: scripts/build-docker
-	docker run -v $(shell pwd)/scripts:/workdir -w=/workdir --rm -it rocker/geospatial Rscript spatial_visualization.R                                    
+	docker run -v $(shell pwd):/workdir -w=/workdir --rm -it rocker/geospatial Rscript spatial_visualization.R                                    
