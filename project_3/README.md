@@ -15,4 +15,4 @@ Clients at UMD are primarily African-American/Black, with White the second large
 ## Note for Peer Feedback
 The Makefile is contained in the project_3 directory. The makefile was used to produce a visualizaiton of the spatial data using an Rscript and a Docker container from rocker/geospatial. 
 
-The final make command is: `make scripts/map.png` (NOTE: Does not work curently)
+The final make command is: `make scripts/map.png` (NOTE: Still undergoing some debugging to run correctly.)
